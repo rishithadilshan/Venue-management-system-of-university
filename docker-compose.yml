@@ -20,7 +20,7 @@ services:
       JWT_EXPIRES_IN: 7d
       CLIENT_URL: "*"
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
 
   frontend:
     build: ./frontend
@@ -28,7 +28,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
 
 volumes:
   mongo-data:
