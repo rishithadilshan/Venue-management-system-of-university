@@ -47,6 +47,7 @@ status changes), and read access to the live campus-wide schedule.
 
 ## Project structure
 
+```
 uvms/
 ├── backend/
 │   ├── config/db.js              # Mongo connection
@@ -76,3 +77,4 @@ uvms/
 ├── docker-compose.yml               # mongo + backend + frontend
 ├── .github/workflows/ci.yml         # install/build/docker-build on push
 └── README.md
+```
