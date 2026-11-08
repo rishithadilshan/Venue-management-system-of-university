@@ -1,0 +1,83 @@
+name: UVMS CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - integration/uvms-clean
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  frontend:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build React frontend
+        working-directory: frontend
+        run: npm run build
+
+  backend:
+    name: Backend Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Check backend JavaScript syntax
+        run: |
+          find backend -path '*/node_modules' -prune -o \
+            -type f -name '*.js' -exec node --check {} \;
+
+  docker:
+    name: Docker Image Build
+    runs-on: ubuntu-latest
+
+    needs:
+      - frontend
+      - backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build frontend Docker image
+        run: docker build -t uvms-frontend:ci ./frontend
+
+      - name: Build backend Docker image
+        run: docker build -t uvms-backend:ci ./backend
